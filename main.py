@@ -16,12 +16,11 @@ import spotipy
 
 # Create a DataFrame
 file = "data/global-spotify-top200-8-17.csv"
-# sp = pd.read_csv(file)
+sp = pd.read_csv(file)
+print sp
 
 spotify = spotipy.Spotify()
 
-name = "Justin Timberlake"
-results = spotify.search(q='artist:' + name, type='artist')
-print results
-
-# print sp.head()
+# name = "Justin Timberlake"
+# results = spotify.search(q='artist:' + name, type='artist')
+# print results
