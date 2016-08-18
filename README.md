@@ -1,48 +1,58 @@
-# Ultrasound-Nerve-Segmentation
-A prediction model that can identify nerve structures in a dataset of ultrasound images of the human neck.
+# Data == Music
+A prediction model that can predict how highly rated music will be based on audio characteristics and track information from Spotify.
+
+### The problem & my hypothesis
+Music can be infinitely varied, and yet people are often able to agree on what is "good". Can we predict a track's popularity based on its characteristics?
+
+### My hypothesis
+I think we can. A few features spring to mind: "danceability", being in a major key, and probably certain key lyrics ("love", "c'mon").
 
 ### The data:
-The image set is pretty large (over 1gb), so I'm not going to host it here. Instead please grab it from the original source on Kaggle:
-https://www.kaggle.com/c/ultrasound-nerve-segmentation/data
+[Spotify Charts](https://spotifycharts.com) is a cool little project launched by Spotify in 2013, showcasing the most listened to and most viral tracks on Spotify each week. I grabbed the convenient .csv of popular tracks which contains the track name, artist name, top 200 ranking, and a URL to the track on spotify's web client.
 
-This question and data are all thanks to a [Kaggle competition](https://www.kaggle.com/c/ultrasound-nerve-segmentation), thanks go to them for an inspiring problem and to the helpful competitors' posts on the [forum](https://www.kaggle.com/c/ultrasound-nerve-segmentation/forums)
+I then used [Spotify Charts](https://github.com/plamere/spotipy/blob/master/docs/index.rst), a convenient Python wrapper for the Spotify web API, to get the audio characteristics. The wrapper's audio_features method takes a song ID, which I extracted from the URL in the csv file.
 
-* The highlighted regions of each image are [run-length encoded](http://www.stoimen.com/blog/2012/01/09/computer-algorithms-data-compression-with-run-length-encoding/)
-* 5635 observations in the training set. Each observation is one image.
-* 3 features (p=3): subject, img, pixels
-* Response: the pixels that make up the area of the BP region in the ultrasound image, if any is found.
-* Unsure: Classification problem since response is categorical
+The hardest part remains: putting everything neatly in a DataFrame together such that we can make predictions off it!
 
-### The questions:
-1. What is the question you hope to answer?
-Can we identify a specific nerve structure ([Brachial Plexus](https://en.wikipedia.org/wiki/Brachial_plexus)) in [ultrasound images](https://en.wikipedia.org/wiki/Medical_ultrasound) of the human neck?
+### Pre-processing
+This data is pristine! No cleaning or modification was needed, it went into a DataFrame as-is.
 
-2. What data are you planning to use to answer that question?
-Training images with the desired region of the neck manually highlighted (if present at all).
+### Exploration and visualization
+Not much exploration yet. First need a complete DataFrame!
 
-3. What do you know about the data so far?
-	* The images are pretty noisy
-	* Not every ultrasound image contains the Brachial Plexus
-<br>
+### Features
+From [Spotify's web API documentation](https://developer.spotify.com/web-api/track-endpoints), I gathered enough background to form a laundry list of features:
+* acousticness - A confidence measure from 0.0 to 1.0 of whether the track is acoustic. 1.0 represents high confidence the track is acoustic.
+* analysis_url - An HTTP URL to access the full audio analysis of this track. An access token is required to access this data.
+* danceability - Danceability describes how suitable a track is for dancing based on a combination of musical elements including tempo, rhythm stability, beat strength, and overall regularity. A value of 0.0 is least danceable and 1.0 is most danceable.
+* duration_ms - The duration of the track in milliseconds.
+* energy - Energy is a measure from 0.0 to 1.0 and represents a perceptual measure of intensity and activity. Typically, energetic tracks * feel fast, loud, and noisy. For example, death metal has high energy, while a Bach prelude scores low on the scale. Perceptual features contributing to this attribute include dynamic range, perceived loudness, timbre, onset rate, and general entropy.
+* id - The Spotify ID for the track.
+* instrumentalness - Predicts whether a track contains no vocals. "Ooh" and "aah" sounds are treated as instrumental in this context. Rap or spoken word tracks are clearly "vocal". The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content. Values above 0.5 are intended to represent instrumental tracks, but confidence is higher as the value approaches 1.0.
+* key - The key the track is in. Integers map to pitches using standard Pitch Class notation. E.g. 0 = C, 1 = C♯/D♭, 2 = D, and so on.
+* liveness - Detects the presence of an audience in the recording. Higher liveness values represent an increased probability that the track was performed live. A value above 0.8 provides strong likelihood that the track is live.
+* loudness - The overall loudness of a track in decibels (dB). Loudness values are averaged across the entire track and are useful for comparing relative loudness of tracks. Loudness is the quality of a sound that is the primary psychological correlate of physical strength (amplitude). Values typical range between -60 and 0 db.
+* mode - Mode indicates the modality (major or minor) of a track, the type of scale from which its melodic content is derived. Major is represented by 1 and minor is 0.
+* speechiness - Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the closer to 1.0 the attribute value. Values above 0.66 describe tracks that are probably made entirely of spoken words. Values between 0.33 and 0.66 describe tracks that may contain both music and speech, either in sections or layered, including such cases as rap music. Values below 0.33 most likely represent music and other non-speech-like tracks.
+* tempo - The overall estimated tempo of a track in beats per minute (BPM). In musical terminology, tempo is the speed or pace of a given piece and derives directly from the average beat duration.
+* time_signature - An estimated overall time signature of a track. The time signature (meter) is a notational convention to specify how many beats are in each bar (or measure).
+* track_href - A link to the Web API endpoint providing full details of the track.
+* type - The object type: "audio_features"
+* uri - The Spotify URI for the track.
+* valence - A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).
 
-#### Why I think it's a worthwhile project:
-The easy answer is: I'm studying and working in healthcare! It's a fitting topic given my field. The truer answer is: I think tech and data is the best way that I personally can help influence people's health for the better.
-<br>
+### Modeling process
+1. Get everything into a dataframe, abstracting features into dummy variables when necessary.
+2. Use Linear Regression model fit to the data
+3. Use cross-validation to gauge accuracy
+4. Accuracy improvement
+5. (optional) dimensionality reduction
 
-#### Why Kaggle thinks it's a worthwhile project:
-"Even the bravest patient cringes at the mention of a surgical procedure. Surgery inevitably brings discomfort, and oftentimes involves significant post-surgical pain. Currently, patient pain is frequently managed through the use of narcotics that bring a bevy of unwanted side effects.
+### Challenges & successes
+The first challenge is the one I'm on now: getting the data into a usable format!
 
-Accurately identifying nerve structures in ultrasound images is a critical step in effectively inserting a patient’s pain management catheter... Doing so would improve catheter placement and contribute to a more pain free future."
+### Extensions / business applications
+Spotify themselves could use this, or a music publisher could use it to help make a business case for putting one of their artists on Spotify. If, for example, their music were very similar to a known quantity, they might be likely to rank similarly once well-exposed to the public.
 
-#### Evaluation
-
-This competition is evaluated on the mean Dice coefficient. The Dice coefficient can be used to compare the pixel-wise agreement between a predicted segmentation and its corresponding ground truth. The formula is given by:
-
-![Dice coefficient formula](dice_coefficient_formula.jpg)
-
-where X is the predicted set of pixels and Y is the ground truth. The Dice coefficient is defined to be 1 when both X and Y are empty. The leaderboard score is the mean of the Dice coefficients for each image in the test set.
-
-#### Submission
-In order to reduce the submission file size, our metric uses run-length encoding on the pixel values.  Instead of submitting an exhaustive list of indices for your segmentation, you will submit pairs of values that contain a start position and a run length. E.g. '1 3' implies starting at pixel 1 and running a total of 3 pixels (1,2,3).
-
-The competition format requires a space delimited list of pairs. For example, '1 3 10 5' implies pixels 1,2,3,10,11,12,13,14 are to be included in the mask. The metric checks that the pairs are sorted, positive, and the decoded pixel values are not duplicated. The pixels are numbered from top to bottom, then left to right: 1 is pixel (1,1), 2 is pixel (2,1), etc.
+### Key learnings & conclusions
+None yet - please hold
