@@ -47,7 +47,8 @@ From [Spotify's web API documentation](https://developer.spotify.com/web-api/tra
 2. Fit a model to the data.
 3. Gauge accuracy (at least at first, I plan on using cross-validation for this)
 4. Repeat steps 2-3 with different estimators to improve accuracy.
-5. (optional) dimensionality reduction
+5. Add new features, partly out of curiosity and partly to improve accuracy.
+6. (optional) dimensionality reduction
 
 ### Challenges & successes
 The first challenge is the one I'm on now: getting the data into a usable format!
