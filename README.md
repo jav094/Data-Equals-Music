@@ -45,10 +45,10 @@ From [Spotify's web API documentation](https://developer.spotify.com/web-api/tra
 ### Modeling process
 1. Get everything into a DataFrame, abstracting features into dummy variables when necessary.
 2. Fit a model to the data.
-3. Gauge accuracy (at least at first, I plan on using cross-validation for this)
+3. Gauge accuracy (at least at first, I plan on using cross-validation for this).
 4. Repeat steps 2-3 with different estimators to improve accuracy.
 5. Add new features, partly out of curiosity and partly to improve accuracy.
-6. (optional) dimensionality reduction
+6. (optional) dimensionality reduction.
 
 ### Challenges & successes
 The first challenge is the one I'm on now: getting the data into a usable format!
