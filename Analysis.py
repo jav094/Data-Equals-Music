@@ -19,8 +19,8 @@ from DataEqualsMusic import SpotiAPI
 
 
 class Analysis(object):
-    # Instantiate the API and get our (fully populated and cleaned) DataFrame!
-    # If API is down or something, SpotiAPI can export the DataFrame to a .csv, backups kept in /data
+    # Online mode is off by default, so we use our generated .csv
+    # In Online Mode, we instantiate the API and get our populated and cleaned DataFrame in real-time.
     def __init__(self):
         if ONLINE_MODE:        
             api = SpotiAPI()
@@ -30,7 +30,7 @@ class Analysis(object):
             self.df = pd.read_csv(file)
 
     # Fit a model to the data
-    def fit_model(self):
+    def fit_model(self, df, X, y):
         raise NotImplementedError()
 
     # Gauge accuracy (at least at first, I plan on using cross-validation for this)
@@ -43,4 +43,36 @@ class Analysis(object):
 a = Analysis()
 df = a.df
 
-pp df.head(1)
+pp.pprint(df.head(20))
+# print df.columns
+
+# Below: all grabbed from class notebook
+
+# # define X and y
+feature_cols = ['loudness', 'instrumentalness', 'valence', 'danceability']
+X = df[feature_cols]
+# y = titanic.Survived
+
+# # train/test split
+# from sklearn.cross_validation import train_test_split
+# X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1)
+
+# # train a logistic regression model
+# from sklearn.linear_model import LogisticRegression
+# logreg = LogisticRegression(C=1e9)
+# logreg.fit(X_train, y_train)
+
+# # make predictions for testing set
+# y_pred_class = logreg.predict(X_test)
+
+# EITHER:
+
+# # calculate testing accuracy
+# from sklearn import metrics
+# print metrics.accuracy_score(y_test, y_pred_class)
+
+# OR:
+
+# calculate cross-validated AUC
+# from sklearn.cross_validation import cross_val_score
+# cross_val_score(logreg, X, y, cv=10, scoring='roc_auc').mean()

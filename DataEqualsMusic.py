@@ -35,20 +35,20 @@ class SpotiAPI(object):
         # self.add_lyrics_to_frame(sp_client)
 
         # Do this last
-        # self.clean_frame()
+        self.clean_frame()
 
-    # Override "represent" for this class so that it just prints the dataframe contents nicely.
+    # Override "represent" for this class so that it's' formatted nicely when we try to print it.
     def __repr__(self):
         return str(pp.pprint(self.df))
 
     # Adds TrackID feature, sliced from URL
     def add_track_id_to_frame(self):
-        for track in self.df.values:
-            self.df["TrackID"] = self.get_track_id(track[4])
+        for index, row in self.df.iterrows():
+            self.df.loc[index,"TrackID"] = self.get_track_id(row.URL)
 
     # Drops unnneeded features (e.g. Streams)
     def clean_frame(self):
-        cols_to_drop = ["Streams", "URL"]
+        cols_to_drop = ["Streams", "URL", "analysis_url", "track_href","type"]
         self.df.drop(cols_to_drop,inplace=True,axis=1)    
 
     # Returns substring between "track/" and the end of the string. That's the track ID!
@@ -68,7 +68,7 @@ class SpotiAPI(object):
             track_audio_features = sp_client.audio_features(tracks=[track.TrackID])[0]
 
             # Iterate through the audio features and add each as a new feature column
-            for key, value in track_audio_features.iteritems():
+            for key, value in track_audio_features.items():
                 self.df[key] = value
 
     # Fetches track info for specific track and adds them to the df.
