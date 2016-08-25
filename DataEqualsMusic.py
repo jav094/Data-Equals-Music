@@ -46,11 +46,6 @@ class SpotiAPI(object):
         for index, row in self.df.iterrows():
             self.df.loc[index,"TrackID"] = self.get_track_id(row.URL)
 
-    # Drops unnneeded features (e.g. Streams)
-    def clean_frame(self):
-        cols_to_drop = ["Streams", "URL", "analysis_url", "track_href","type"]
-        self.df.drop(cols_to_drop,inplace=True,axis=1)    
-
     # Returns substring between "track/" and the end of the string. That's the track ID!
     def get_track_id(self, url):
         try:
@@ -62,14 +57,14 @@ class SpotiAPI(object):
 
     # Fetches audio features for specific tracks and adds them to the df.
     def add_audio_features_to_frame(self, sp_client):
-        for track in self.df.itertuples():
+        for index, row in self.df.iterrows():
             # Get audio features for the current track
             # Note: we need [0] to actually get IN the dictionary, otherwise this returns a list containing the dict.
-            track_audio_features = sp_client.audio_features(tracks=[track.TrackID])[0]
+            track_audio_features = sp_client.audio_features(tracks=[row.TrackID])[0]
 
             # Iterate through the audio features and add each as a new feature column
             for key, value in track_audio_features.items():
-                self.df[key] = value
+                self.df.loc[index,key] = value
 
     # Fetches track info for specific track and adds them to the df.
     def add_track_info_to_frame(self, sp_client):
@@ -78,6 +73,11 @@ class SpotiAPI(object):
     # Fetches track lyrics for specific track and adds them to the df.
     def add_lyrics_to_frame(self, sp_client):
         raise NotImplementedError("Not implemented")
+
+    # Drops unnneeded features (e.g. Streams)
+    def clean_frame(self):
+        cols_to_drop = ["Streams", "URL", "analysis_url", "track_href","type"]
+        self.df.drop(cols_to_drop,inplace=True,axis=1)  
 
     # Export dataframe to a .csv just in case the API stops liking us.
     def save_to_csv(self, file):
