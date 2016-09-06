@@ -14,7 +14,7 @@ class SpotiAPI(object):
 
     def __init__(self):
         file = "data/global-spotify-top200-8-18.csv"
-        self.df = pd.read_csv(file, index_col="Position")
+        self.df = pd.read_csv(file)
 
         # Grabs API client ID and client secret from spotify_tokens file.
         tokensfile = open("spotify_tokens", "r")
