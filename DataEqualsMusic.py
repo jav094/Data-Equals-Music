@@ -14,9 +14,9 @@ class SpotiAPI(object):
 
     def __init__(self):
         file = "data/global-spotify-top200-8-18.csv"
-        self.df = pd.read_csv(file)
+        self.df = pd.read_csv(file, index_col="Position")
 
-        # Grabs API client ID and client secret from spotify_tokens file
+        # Grabs API client ID and client secret from spotify_tokens file.
         tokensfile = open("spotify_tokens", "r")
         SP_CLIENT_ID = tokensfile.readline().rstrip()
         SP_CLIENT_SECRET = tokensfile.readline().rstrip()
@@ -26,15 +26,15 @@ class SpotiAPI(object):
         sp_client = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
         sp_client.trace = False
 
-        # Get track id, audio features, track info, and other features into DataFrame
+        # Get track id, audio features, track info, and other features into DataFrame.
         self.add_track_id_to_frame()
         self.add_audio_features_to_frame(sp_client)
         # self.add_lyrics_to_frame(sp_client)
 
-        # Do this last
+        # Do this last, it drops unnneeded features and cleans the data if necessary.
         self.clean_frame()
 
-    # Adds TrackID feature, sliced from URL
+    # Adds TrackID feature, sliced from URL.
     def add_track_id_to_frame(self):
         for index, row in self.df.iterrows():
             self.df.loc[index,"TrackID"] = self.get_track_id(row.URL)
@@ -52,7 +52,7 @@ class SpotiAPI(object):
     def add_audio_features_to_frame(self, sp_client):
         for index, row in self.df.iterrows():
             # Hit the Spotify API for the current track's audio features.
-            # Note: we need [0] to actually get IN the dictionary, otherwise this returns a list containing the dict.
+            # Note: we need [0] to actually get to the dictionary, otherwise this returns a list containing the dict.
             track_audio_features = sp_client.audio_features(tracks=[row.TrackID])[0]
 
             # Iterate through the audio features and add each as a new feature column.
@@ -66,7 +66,7 @@ class SpotiAPI(object):
     # Drops unnneeded features.
     def clean_frame(self):
         cols_to_drop = ["Streams", "URL", "analysis_url", "track_href", "type", "uri", "id", "Track Name", "Artist", "TrackID"]
-        self.df.drop(cols_to_drop, inplace=True, axis=1)  
+        self.df.drop(cols_to_drop, inplace=True, axis=1)
 
     # Export dataframe to a .csv (which is what we do our analysis on).
     def save_to_csv(self, file):
